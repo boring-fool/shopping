@@ -22,4 +22,5 @@ urlpatterns = [
     #首页
     path(r'',include(('contents.urls','contents'),namespace='contents')),
     path(r'',include(('verifications.urls','verifications'),namespace='verifications')),
+    path(r'',include(('areas.urls','areas'),namespace='areas')),
 ]

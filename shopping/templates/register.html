@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>美多商城-注册</title>
+	<title>商城-注册</title>
 	<link rel="stylesheet" type="text/css" href="{{static('css/reset.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{static('css/main.css')}}">
 	<script src="{{static('js/vue-2.5.16.js')}}"></script>
@@ -19,7 +19,7 @@
 		<div class="r_con fr">
 			<div class="reg_title clearfix">
 				<h1>用户注册</h1>
-				<a href="login.html">登录</a>
+				<a href="login">登录</a>
 			</div>
 			<div class="reg_form clearfix">
 				<form method="post" class="register_form" @submit="on_submit" v-cloak>
@@ -53,13 +53,16 @@
 						</li>
 						<li>
 							<label>短信验证码:</label>
-							<input type="text" name="sms_code" id="msg_code" class="msg_input">
-							<a href="javascript:;" class="get_msg_code">获取短信验证码</a>
-							<span class="error_tip">请填写短信验证码</span>
+							<input type="text" v-model="sms_code" @blur="check_sms_code" name="sms_code" id="msg_code" class="msg_input">
+							<a @click="send_sms_code" class="get_msg_code">[[ sms_code_tip ]]</a>
+							<span class="error_tip" v-show="error_sms_code">[[ sms_code_error_message ]]</span>
+							{% if sms_code_errmsg %}
+                                <span class="error_tip">{{ sms_code_errmsg }}</span>
+                            {% endif %}
 						</li>
 						<li class="agreement">
 							<input type="checkbox" v-model="allow" @change="check_allow" name="allow" id="allow">
-							<label>同意”美多商城用户使用协议“</label>
+							<label>同意”商城用户使用协议“</label>
 							<span class="error_tip">请勾选用户协议</span>
 						</li>
 						{% if register_errmsg %}

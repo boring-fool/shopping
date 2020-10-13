@@ -7,9 +7,11 @@ let vm = new Vue({
 		password2: '',		// 确认密码
 		mobile: '',			// 手机号
 		allow: '',			// 同意协议
-		image_code_url:'',   //验证码
+		image_code_url:'',   //验证码地址
 		uuid:'',
-		image_code:'',
+		image_code:'',      //图片验证码
+        sms_code_tip:'点击发送短信验证码' ,  //点击发送短信验证码,
+        sms_code:''  ,     //短信验证码
 
 		error_name: false,
 		error_password: false,
@@ -17,10 +19,13 @@ let vm = new Vue({
 		error_mobile: false,
 		error_allow: false,
         error_image_code:false,
+        error_sms_code:false,
+        sms_flag:false,
 
 		error_name_message: '',		// 用户名错误提示
 		error_mobile_message: '',	// 密码错误提示
-		error_image_code_message:'' //验证码错误提示
+		error_image_code_message:'' ,//验证码错误提示
+		sms_code_error_message:''
 	},
 	mounted(){//页面加载完会被调用
         this.generate_image_code()
@@ -109,6 +114,7 @@ let vm = new Vue({
 			}
 
 		},
+		//检验图形验证码
 		check_image_code(){
 		    if (this.image_code.length!=4){
 		            this.error_image_code_message='请输入正确验证码'
@@ -116,6 +122,69 @@ let vm = new Vue({
 		    }
 		    else{
 		        this.error_image_code=false
+		    }
+		},
+		//短信验证
+		send_sms_code(){
+		     if (this.sms_flag==true){
+		        return;
+		     }
+		     this.sms_flag = true;
+		     this.check_mobile;
+		     this.check_image_code;
+		     if(this.error_mobile==true||this.error_image_code==true){
+		        this.sms_flag = false;
+		        return;
+		     }
+		     let url = '/sms_codes/' + this.mobile +'/?image_code=' + this.image_code + '&uuid=' + this.uuid;
+             axios.get(url,{
+		        responseType:'json'
+		    })
+		    .then(
+		        response=>{
+		          if(response.data.code=='0'){
+		          //展示60秒倒计时
+		            let num = 60
+		            let t = setInterval(()=>{
+		                if(num<0){
+		                    clearInterval(t)
+		                    this.sms_code_tip = '点击发送短信验证码';
+		                    this.generate_image_code();
+		                    this.sms_flag = false;
+		                }else{
+		                    num -= 1;
+		                    this.sms_code_tip = num + '秒';
+		                }
+		            },1000)
+		          }
+		          else{
+		            if(response.data.code=='4001'){
+		            //图片验证码错误
+		                this.error_image_code_message = response.data.errmsg;
+		                this.error_image_code = true;
+		                this.generate_image_code();
+		            }else{
+		                this.sms_code_error_message = response.data.errmsg;
+		                this.error_image_code = true;
+		            }
+		                this.sms_flag = false;
+		          }
+		        }
+		    )
+		    .catch(
+		        error=>{
+		            console.log(error.response)
+		            this.sms_flag = false;
+		        })
+		},
+		//校验短信验证码
+		check_sms_code(){
+		    if (this.sms_code.length!=6){
+		        this.sms_code_error_message = '验证码输入错误';
+		        this.error_sms_code = true;
+		    }
+		    else{
+		        this.error_sms_code = false;
 		    }
 		},
 		// 校验是否勾选协议
@@ -133,9 +202,11 @@ let vm = new Vue({
 			this.check_password2();
 			this.check_mobile();
 			this.check_allow();
+			this.check_image_code();
+			this.check_sms_code();
 
 			if(this.error_name == true || this.error_password == true || this.error_password2 == true
-				|| this.error_mobile == true || this.error_allow == true) {
+				|| this.error_mobile == true || this.error_sms_code == true|| this.error_allow == true) {
                 // 禁用表单的提交
 				window.event.returnValue = false;
             }
