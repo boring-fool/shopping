@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'haystack',
     'users',
     'contents',
     'verifications',
     'areas',
+    'goods',
+    'carts',
 
 ]
 
@@ -118,32 +121,45 @@ WSGI_APPLICATION = 'shopping.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST':'192.168.159.129',
+        'HOST':'192.168.159.132',
         'PORT':3306,
         'USER':'shopping',
-        'PASSWORD':'789563',
+        'PASSWORD':'123456',
         'NAME': 'shopping',
     }
 }
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.159.129:6379/0",
+        "LOCATION": "redis://192.168.159.132:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
     "session": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.159.129:6379/1",
+        "LOCATION": "redis://192.168.159.132:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
-
     "verify_code": { #验证码
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.159.129:6379/2",
+        "LOCATION": "redis://192.168.159.132:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "history": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://192.168.159.132:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "carts": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://192.168.159.132:6379/4",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -175,7 +191,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -238,11 +255,25 @@ LOGIN_URL = '/login/'
 
 # 邮件参数
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 导入邮件模块
-EMAIL_HOST = 'smtp.yeah.net' # 发邮件主机
+EMAIL_HOST = 'smtp.qq.com' # 发邮件主机
 EMAIL_PORT = 25 # 发邮件端口
-EMAIL_HOST_USER = 'dailyfreshzxc@yeah.net' # 授权的邮箱
-EMAIL_HOST_PASSWORD = 'dailyfresh123' # 邮箱授权时获得的密码，非注册登录密码
-EMAIL_FROM = '商城<dailyfreshzxc@yeah.net>' # 发件人抬头
+EMAIL_HOST_USER = '476663441@qq.com' # 授权的邮箱
+EMAIL_HOST_PASSWORD = 'ghjnjqezqjbjbgee' # 邮箱授权时获得的密码，非注册登录密码
+EMAIL_FROM = '商城' # 发件人抬头
 
 # 邮箱验证链接
 EMAIL_VERIFY_URL = 'http://www.shopping.site:8000/emails/verification/'
+FASTDFS_BASE_URL = 'http://192.168.159.132:8888/'
+DEFAULT_FILE_STORAGE = 'shopping.utils.fastdfs.fdfs_storage.FdfsStorage'
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://192.168.159.132:9200/', # Elasticsearch服务器ip地址，端口号固定为9200
+        'INDEX_NAME': 'shopping', # Elasticsearch建立的索引库的名称
+    },
+}
+
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
