@@ -25,5 +25,5 @@ urlpatterns = [
     path(r'',include(('verifications.urls','verifications'),namespace='verifications')),
     path(r'',include(('areas.urls','areas'),namespace='areas')),
     path(r'',include(('goods.urls','goods'),namespace='goods')),
-    path(r'',include(('carts:urls','carts'),namespace='carts')),
+    path(r'',include(('carts.urls','carts'),namespace='carts'))
 ]

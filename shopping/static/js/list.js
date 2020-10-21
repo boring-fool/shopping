@@ -35,7 +35,7 @@ let vm = new Vue({
         },
         // 获取简单购物车数据
         get_carts(){
-        	let url = '/carts/simple/';
+        	let url = '/carts/simple';
             axios.get(url, {
                 responseType: 'json',
             })

@@ -10,6 +10,7 @@ from django_redis import get_redis_connection
 
 from .models import User,Address
 from goods.models import SKU
+from carts.utils import merge_cart_cookie_to_redis
 from shopping.utils.response_code import RETCODE
 from shopping.utils.views import LoginJsonMixin
 from celery_tasks.email.tasks import send_verify_email
@@ -59,6 +60,7 @@ class LoginView(View):
         else:
             response = redirect(reverse('contents:index'))
         response.set_cookie('username',user.username,max_age=3600*24*14)
+        response = merge_cart_cookie_to_redis(request,user,response)
         return response
 
 class LogoutView(View):
