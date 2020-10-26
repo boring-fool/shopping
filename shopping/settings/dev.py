@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'areas',
     'goods',
     'carts',
+    'orders',
+    'payment',
 
 ]
 
@@ -119,13 +121,21 @@ WSGI_APPLICATION = 'shopping.wsgi.application'
 # }
 
 DATABASES = {
-    'default': {
+    'default': { #写（主机）
         'ENGINE': 'django.db.backends.mysql',
         'HOST':'192.168.159.132',
         'PORT':3306,
         'USER':'shopping',
         'PASSWORD':'123456',
         'NAME': 'shopping',
+    },
+'slave': { # 读（从机）
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '192.168.103.158',
+        'PORT': 8306,
+        'USER': 'root',
+        'PASSWORD': 'mysql',
+        'NAME': 'meiduo_mall'
     }
 }
 CACHES = {
@@ -277,3 +287,12 @@ HAYSTACK_CONNECTIONS = {
 # 当添加、修改、删除数据时，自动生成索引
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+
+#支付宝参数
+ALIPAY_APPID = '2016102700768104'
+ALIPAY_DEBUG = True
+ALIPAY_URL = 'https://openapi.alipaydev.com/gateway.do'
+ALIPAY_RETURN_URL = 'http://www.shopping.site:8000/payment/status/'
+
+
+DATABASE_ROUTERS = ['shopping.utils.db_router.MasterSlaveDBRouter']
